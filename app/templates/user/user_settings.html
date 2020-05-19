@@ -53,18 +53,16 @@
                     </tr>
                     <tr>
                         <td >Уровень доступа</td>
-                        <td class="aligned">  <input name="first_name" type="radio"  value="Ученик" > Ученик<Br>
-                                              <input name="first_name" type="radio"  value="Модератор" > Модератор<Br>
-                                              <input name="first_name" type="radio"  value="Админ" > Админ<Br>
+                        <td class="aligned">  {{f.syns}}
                         </td>
                     </tr>
                      <tr>
-                        <td >Уровень доступа</td>
-                        <td class="aligned">  <input name="first_name" type="checkbox"  value="Ученик" > Забанен<Br></td>
+                        <td >Заблокировать</td>
+                        <td class="aligned">  <input name="bans" type="checkbox"  value="bans" > Забанен<Br></td>
                     </tr>
                     <tr>
                         <td>Группа</td>
-                        <td class="aligned"> <input name="teacher" type="text" class="form-control" value="{%if user.profile.group %}{{user.profile.group}}{%else%}Не закреплен{%endif%}"></td>
+                        <td class="aligned"> <input name="group" type="text" class="form-control" value="{%if user.profile.group %}{{user.profile.group}}{%else%}Не закреплен{%endif%}"></td>
                     </tr>
 
                     </tbody>

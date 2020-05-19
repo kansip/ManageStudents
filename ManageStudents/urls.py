@@ -28,4 +28,8 @@ urlpatterns = [
     path('user/list', views.user_list_page),
     path('user/<int:user_id>', views.user_page_view),
     path('user/<int:user_id>/settings', views.user_page_changes_view),
+
+    # task
+    path('task/list', views.task_list_view),
+    path('task/<int:task_id>', views.task_view),
 ]
