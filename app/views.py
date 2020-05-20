@@ -199,6 +199,17 @@ def task_view(request, task_id):
                 for true_answer in true_answers:
                     if true_answer.true_flags == data:
                         context['responce'] = 2
-                        #TaskAnswers.save(answer=data, score=task.cost, task_id=task_id, author_id=request.user.id)
+                        # TaskAnswers.save(answer=data, score=task.cost, task_id=task_id, author_id=request.user.id)
                         break
     return render(request, 'tasks/task.html', context)
+
+@login_required
+def course_list_view(request):
+    context = {'menu': get_context_menu(request, REGISTER_PAGE_NAME)}  # REGISTER_PAGE_NAME - заглушка
+    return render(request, 'course/course_list.html', context)
+
+@login_required
+def course_view(request, course_id):
+    context = {'menu': get_context_menu(request, REGISTER_PAGE_NAME)}  # REGISTER_PAGE_NAME - заглушка
+    context
+    return render(request, 'course/course.html', context)

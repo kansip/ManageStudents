@@ -32,4 +32,8 @@ urlpatterns = [
     # task
     path('task/list', views.task_list_view),
     path('task/<int:task_id>', views.task_view),
+
+    #course
+    path('course/list', views.course_list_view),
+    path('course/<int:course_id>', views.course_view),
 ]
