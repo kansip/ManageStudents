@@ -31,30 +31,29 @@ class TaskTrueAnswers(models.Model):
 class TaskAnswers(models.Model):
     task_id = models.ForeignKey(Task, on_delete=models.CASCADE)
     answer = models.TextField()
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    author = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
     time = models.DateTimeField()
     score = models.IntegerField()
     accuracy = models.BooleanField(default=0)
     revizion = models.BooleanField(default=0)
 
 
-class GroupIDTask(models.Model):
-    group_id = models.IntegerField()
-    task_id = models.ManyToManyField(Task)
-
-
 class TaskGroup(models.Model):
-    group_id = models.IntegerField()
     name = models.CharField(max_length=100)
-    author = models.OneToOneField(User, on_delete=models.CASCADE)
+    author = models.OneToOneField(User, null=True, on_delete=models.SET_NULL)
     data_open = models.DateTimeField()
     data_part_close = models.DateTimeField()
     data_close = models.DateTimeField()
     open = models.BooleanField()
 
 
+class GroupIDTask(models.Model):
+    group_id = models.ForeignKey(TaskGroup, on_delete=models.CASCADE)
+    task_id = models.ManyToManyField(Task)
+
+
 class Lesson(models.Model):
-    teacher = models.ForeignKey(User, on_delete=models.CASCADE)
+    teacher = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
     data_open = models.DateTimeField()
     open = models.BooleanField(default=0)
     blocks = models.ManyToManyField(TaskGroup)
@@ -62,6 +61,12 @@ class Lesson(models.Model):
 
 class Course(models.Model):
     lessons = models.ManyToManyField(Lesson)
-    teacher = models.ForeignKey(User, on_delete=models.CASCADE  )
-    students_group = models.ForeignKey(Group, on_delete=models.CASCADE)
+    teacher = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
     name = models.CharField(max_length=20)
+    image = models.ImageField(upload_to='media/%Y/%m/%d')
+
+
+
+class StudentGroup(models.Model):
+    course_id = models.OneToOneField(Course, on_delete=models.CASCADE)
+    user_id = models.ManyToManyField(User)

@@ -1,12 +1,12 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.shortcuts import render, redirect
 from django.contrib.admin.views.decorators import user_passes_test
 from app.forms import LoginForm, RegisterForm, ChangeProfile, CharFormTask
 from app.menu import get_context_menu, REGISTER_PAGE_NAME, LOGIN_PAGE_NAME, HOME_PAGE_NAME, USER_PAGE_NAME, \
-    USER_LIST_NAME, USER_TASK_NAME
-from app.models import Task, TaskAnswers, TaskFiles, TaskTrueAnswers
+    USER_LIST_NAME, USER_TASK_NAME, COURSE_LIST_NAME
+from app.models import *
 
 
 def index(request):
@@ -203,13 +203,27 @@ def task_view(request, task_id):
                         break
     return render(request, 'tasks/task.html', context)
 
+
 @login_required
 def course_list_view(request):
-    context = {'menu': get_context_menu(request, REGISTER_PAGE_NAME)}  # REGISTER_PAGE_NAME - заглушка
+    context = {'menu': get_context_menu(request, COURSE_LIST_NAME)}  # REGISTER_PAGE_NAME - заглушка
+    user_id = request.user.id
+    courses_id = StudentGroup.objects.filter(user_id=user_id)
+    courses = []
+    for i in courses_id:
+        courses.append(Course.objects.get(id=i.id))
+    context['courses'] = courses
     return render(request, 'course/course_list.html', context)
+
 
 @login_required
 def course_view(request, course_id):
     context = {'menu': get_context_menu(request, REGISTER_PAGE_NAME)}  # REGISTER_PAGE_NAME - заглушка
-    context
+    if not request.user.is_staff():
+        user_id = request.user.id
+
+
+
+    else:
+        pass
     return render(request, 'course/course.html', context)
