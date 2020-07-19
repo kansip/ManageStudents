@@ -3,10 +3,20 @@
     Мои курсы
 {% endblock %}
 {% block extended_content %}
-    <h1>Тут будут мои курсы</h1>
+<div class="container">
+    <br>
+    <h2 >Список всех моих курсов</h2>
+    <hr style="margin-top:30px">
     {% for course in courses %}
-        <div>
-            <img height="50" src="/uploads/{{ article.image }}" width="100" />
-        </div><br>
+
+    <div style="height:300px;">
+        <br>
+        <a href="/course/{{course.id}}" style="color:black;font-size:23px;margin-left:350px;">{{course.name}}</a><br>
+        <div href="/course/{{course.id}}" style="color:black;font-size:17px;margin-left:350px;">{{course.teacher}}</div>
+        <div style="border-radius:100%;width:200px;height:200px;background:grey; margin-left:50px; margin-top:-45px;"></div>
+
+
+    </div><hr>
     {% endfor %}
+</div>
 {% endblock %}

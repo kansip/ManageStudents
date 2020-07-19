@@ -7,6 +7,7 @@ from app.forms import LoginForm, RegisterForm, ChangeProfile, CharFormTask
 from app.menu import get_context_menu, REGISTER_PAGE_NAME, LOGIN_PAGE_NAME, HOME_PAGE_NAME, USER_PAGE_NAME, \
     USER_LIST_NAME, USER_TASK_NAME, COURSE_LIST_NAME
 from app.models import *
+from django.utils import timezone
 
 
 def index(request):
@@ -208,7 +209,7 @@ def task_view(request, task_id):
 def course_list_view(request):
     context = {'menu': get_context_menu(request, COURSE_LIST_NAME)}  # REGISTER_PAGE_NAME - заглушка
     user_id = request.user.id
-    courses_id = StudentGroup.objects.filter(user_id=user_id)
+    courses_id = StudentGroup.objects.filter(user_id=user_id)  # refactor
     courses = []
     for i in courses_id:
         courses.append(Course.objects.get(id=i.id))
@@ -219,11 +220,31 @@ def course_list_view(request):
 @login_required
 def course_view(request, course_id):
     context = {'menu': get_context_menu(request, REGISTER_PAGE_NAME)}  # REGISTER_PAGE_NAME - заглушка
-    if not request.user.is_staff():
-        user_id = request.user.id
+    user_id = request.user.id
+    stud_list = StudentGroup.objects.filter(user_id=user_id)
+    course = Course.objects.get(id=course_id)
+    context['course_name'] = "ХЗ"
+    lessons = []
+    for i in stud_list:
+        if i.course_id.id == course_id:
+            context['lessons'] = course.lessons.all()
+            context['date'] = timezone.now()
+            context['course'] = course
+            break
 
-
-
-    else:
-        pass
     return render(request, 'course/course.html', context)
+
+
+@login_required
+def lesson_view(request, course_id, lesson_id):
+    context = {'menu': get_context_menu(request, REGISTER_PAGE_NAME)}  # REGISTER_PAGE_NAME - заглушка
+    user_id = request.user.id
+    stud_list = StudentGroup.objects.filter(user_id=user_id)
+    course = Course.objects.get(id=course_id)
+    context['course_name'] = "ХЗ"
+    lessons = []
+    for i in stud_list:
+        if i.course_id.id == course_id:
+            context['lesson'] = course.lessons.get(id=lesson_id)
+            break
+    return render(request, 'course/lesson/lesson.html', context)

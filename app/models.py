@@ -54,19 +54,26 @@ class GroupIDTask(models.Model):
 
 class Lesson(models.Model):
     teacher = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
-    data_open = models.DateTimeField()
-    open = models.BooleanField(default=0)
+    date = models.DateTimeField()
     blocks = models.ManyToManyField(TaskGroup)
+    name = models.CharField(max_length=30)
 
 
 class Course(models.Model):
     lessons = models.ManyToManyField(Lesson)
     teacher = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
     name = models.CharField(max_length=20)
-    image = models.ImageField(upload_to='media/%Y/%m/%d')
-
+    image = models.ImageField(upload_to='course/', blank=True)
 
 
 class StudentGroup(models.Model):
     course_id = models.OneToOneField(Course, on_delete=models.CASCADE)
     user_id = models.ManyToManyField(User)
+
+
+class Grades(models.Model):
+    grade = models.IntegerField()
+    user = models.ForeignKey(User, blank=True, on_delete=models.CASCADE)
+    teacher = models.ForeignKey(User, null=True,on_delete=models.SET_NULL, related_name='+')
+    blocks = models.ForeignKey(Lesson, on_delete=models.CASCADE)
+    weight = models.IntegerField()

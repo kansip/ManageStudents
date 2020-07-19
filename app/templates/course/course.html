@@ -4,7 +4,24 @@
 {% endblock %}
 {% block extended_content %}
 <div id="container" class="container mt-5 mb-5">
-    <h3>Уроки</h3>
+    <h3>Уроки курса {{course.name}}</h3><br><br>
+
+
+<div>
+    <table class="table table-hover">
+  <tbody>
+  {%for lesson in lessons %}
+    <tr>
+      <td scope="row" style="width:3%">{% if date <= lesson.date %}<div style="border-radius: 100%;background:grey;width:10px;height:10px; margin:6px;"></div>{% else %}<div style="border-radius: 100%;background:green;width:10px;height:10px; margin:6px;"></div>{% endif %}</td>
+      <td style="width: 20%">{{lesson.date|date:"d M H:m"}}</td>
+      <td><a href="/course/{{course.id}}/{{lesson.id}}" style="color:black">{{lesson.name}}</a></td>
+    </tr>
+    {%endfor%}
+  </tbody>
+</table>
+
+
 </div>
 
+</div>
 {% endblock %}
