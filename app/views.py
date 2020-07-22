@@ -3,11 +3,12 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User, Group
 from django.shortcuts import render, redirect
 from django.contrib.admin.views.decorators import user_passes_test
-from app.forms import LoginForm, RegisterForm, ChangeProfile, CharFormTask
+from app.forms import LoginForm, RegisterForm, ChangeProfile, TaskStringForm
 from app.menu import get_context_menu, REGISTER_PAGE_NAME, LOGIN_PAGE_NAME, HOME_PAGE_NAME, USER_PAGE_NAME, \
     USER_LIST_NAME, USER_TASK_NAME, COURSE_LIST_NAME
 from app.models import *
 from django.utils import timezone
+from app.checkers import *
 
 
 def index(request):
@@ -184,28 +185,6 @@ def task_list_view(request):
 
 
 @login_required
-def task_view(request, task_id):
-    context = {'menu': get_context_menu(request, REGISTER_PAGE_NAME)}  # REGISTER_PAGE_NAME - заглушка
-    task = Task.objects.get(pk=task_id)
-    context['task'] = task
-    if request.method == 'POST':
-        form_task = CharFormTask(request.POST)
-        if form_task.is_valid():
-            data = form_task.cleaned_data['data']
-            context['responce'] = 0
-            if data != '':
-
-                context['responce'] = 1
-                true_answers = TaskTrueAnswers.objects.filter(task_id=task_id)
-                for true_answer in true_answers:
-                    if true_answer.true_flags == data:
-                        context['responce'] = 2
-                        # TaskAnswers.save(answer=data, score=task.cost, task_id=task_id, author_id=request.user.id)
-                        break
-    return render(request, 'tasks/task.html', context)
-
-
-@login_required
 def course_list_view(request):
     context = {'menu': get_context_menu(request, COURSE_LIST_NAME)}  # REGISTER_PAGE_NAME - заглушка
     user_id = request.user.id
@@ -224,7 +203,6 @@ def course_view(request, course_id):
     stud_list = StudentGroup.objects.filter(user_id=user_id)
     course = Course.objects.get(id=course_id)
     context['course_name'] = "ХЗ"
-    lessons = []
     for i in stud_list:
         if i.course_id.id == course_id:
             context['lessons'] = course.lessons.all()
@@ -241,10 +219,49 @@ def lesson_view(request, course_id, lesson_id):
     user_id = request.user.id
     stud_list = StudentGroup.objects.filter(user_id=user_id)
     course = Course.objects.get(id=course_id)
-    context['course_name'] = "ХЗ"
-    lessons = []
     for i in stud_list:
         if i.course_id.id == course_id:
-            context['lesson'] = course.lessons.get(id=lesson_id)
+            lesson = course.lessons.get(id=lesson_id)
+            context['course'] = course
+            context['lesson'] = lesson
+            context['blocks'] = lesson.blocks.all()
+            if len(lesson.blocks.all()) > 0:
+                path = '/course/' + str(course_id) + '/' + str(lesson_id) + '/' + str(lesson.blocks.all()[0].id)
+                return redirect(path)
             break
     return render(request, 'course/lesson/lesson.html', context)
+
+
+def lesson_block_view(request, course_id, lesson_id, block_id):
+    context = {'menu': get_context_menu(request, REGISTER_PAGE_NAME)}  # REGISTER_PAGE_NAME - заглушка
+    user_id = request.user.id
+    stud_list = StudentGroup.objects.filter(user_id=user_id)
+    course = Course.objects.get(id=course_id)
+    context['user_id'] = user_id
+    if request.method == 'POST':
+        form = TaskStringForm(request.POST)
+        if form.is_valid():
+            task_id = form.cleaned_data['task_id']
+            answer = form.cleaned_data['data']
+            allocation(task_id, user_id, answer)
+        lesson = course.lessons.get(id=lesson_id)
+        path = '/course/' + str(course_id) + '/' + str(lesson_id) + '/' + str(lesson.blocks.all()[0].id)
+        return redirect(path)
+    for i in stud_list:
+        if i.course_id.id == course_id:
+            lesson = course.lessons.get(id=lesson_id)
+            block = lesson.blocks.get(id=block_id)
+
+            context['course'] = course
+            context['lesson'] = lesson
+            context['blocks'] = lesson.blocks.all()
+            context['tasks'] = block.tasks.all()
+            break
+    return render(request, 'course/lesson/lesson_block.html', context)
+
+
+def task_view(request, task_id):
+    context = {'menu': get_context_menu(request, REGISTER_PAGE_NAME)}  # REGISTER_PAGE_NAME - заглушка
+    task = Task.objects.get(pk=task_id)
+    context['task'] = task
+    return render(request, 'tasks/task.html', context)

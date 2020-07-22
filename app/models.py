@@ -11,16 +11,25 @@ class TaskFiles(models.Model):
     files = models.FileField(upload_to='uploads/')
 
 
+class TaskAnswers(models.Model):
+    answer = models.TextField()
+    user = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
+    time = models.DateTimeField()
+    score = models.IntegerField()
+    revizion = models.BooleanField(default=0)
+
+
 class Task(models.Model):
     name = models.CharField(max_length=120)
     desc = models.TextField()
     cost = models.IntegerField()
     category = models.CharField(max_length=20)
     files = models.ManyToManyField(TaskFiles)
-    char_format_flag = models.NullBooleanField()
-    string_format_flag = models.NullBooleanField()
-    programmin_format_flag = models.NullBooleanField()
-    revizion_format_flag = models.NullBooleanField()
+    file = models.NullBooleanField()
+    format_flag = models.IntegerField()
+    accuracy = models.BooleanField(default=1)
+    revizion_format_flag = models.BooleanField(default=0)
+    answers = models.ManyToManyField(TaskAnswers)
 
 
 class TaskTrueAnswers(models.Model):
@@ -28,28 +37,15 @@ class TaskTrueAnswers(models.Model):
     true_flags = models.TextField()
 
 
-class TaskAnswers(models.Model):
-    task_id = models.ForeignKey(Task, on_delete=models.CASCADE)
-    answer = models.TextField()
-    author = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
-    time = models.DateTimeField()
-    score = models.IntegerField()
-    accuracy = models.BooleanField(default=0)
-    revizion = models.BooleanField(default=0)
-
-
 class TaskGroup(models.Model):
     name = models.CharField(max_length=100)
-    author = models.OneToOneField(User, null=True, on_delete=models.SET_NULL)
+    author = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
+    local = models.IntegerField()
     data_open = models.DateTimeField()
     data_part_close = models.DateTimeField()
     data_close = models.DateTimeField()
     open = models.BooleanField()
-
-
-class GroupIDTask(models.Model):
-    group_id = models.ForeignKey(TaskGroup, on_delete=models.CASCADE)
-    task_id = models.ManyToManyField(Task)
+    tasks = models.ManyToManyField(Task)
 
 
 class Lesson(models.Model):
@@ -74,6 +70,6 @@ class StudentGroup(models.Model):
 class Grades(models.Model):
     grade = models.IntegerField()
     user = models.ForeignKey(User, blank=True, on_delete=models.CASCADE)
-    teacher = models.ForeignKey(User, null=True,on_delete=models.SET_NULL, related_name='+')
+    teacher = models.ForeignKey(User, null=True, on_delete=models.SET_NULL, related_name='+')
     blocks = models.ForeignKey(Lesson, on_delete=models.CASCADE)
     weight = models.IntegerField()

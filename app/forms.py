@@ -14,8 +14,9 @@ class LoginForm(forms.Form):
     password = forms.CharField()
 
 
-class CharFormTask(forms.Form):
+class TaskStringForm(forms.Form):
     data = forms.CharField()
+    task_id=forms.IntegerField()
 
 
 class ChangeProfile(forms.Form):
