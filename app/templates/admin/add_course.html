@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}
+Создание курса
+{% endblock %}
+{% block extended_content %}
+<br>
+<div class="container">
+    <h3>Создание курса</h3>
+    <hr>
+    <form method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            <label>Название курса</label>
+            <input name="course_name" type="text" class="form-control" placeholder="Введите название курса">
+        </div>
+        <div class="form-group">
+            <label>Педагог</label>
+            <select id="inputState" name="teach" type="select" class="form-control">
+                {% for teacher in teachers %}
+                    {%if teacher.id == user_id %}
+                    <option selected>
+                        {{ teacher.username }}
+                    </option>
+                    {% else %}
+                    <option>
+                        {{ teacher.username }}
+                    </option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+{% endblock %}

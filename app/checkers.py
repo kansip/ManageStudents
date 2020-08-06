@@ -33,6 +33,7 @@ def string_cheker(user_id, task_id, answer):
     else:
         for true_answer in true_answers:
             if answer == true_answer.true_flags:
+                task.correct_answer.add(User.objects.get(id=user_id))
                 res = task.cost
                 break
         record_answer(task_id, user_id, res, answer)

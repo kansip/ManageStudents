@@ -1,4 +1,5 @@
 from django import forms
+from app.models import User
 
 
 class RegisterForm(forms.Form):
@@ -16,7 +17,7 @@ class LoginForm(forms.Form):
 
 class TaskStringForm(forms.Form):
     data = forms.CharField()
-    task_id=forms.IntegerField()
+    task_id = forms.IntegerField()
 
 
 class ChangeProfile(forms.Form):
@@ -31,3 +32,12 @@ class ChangeProfile(forms.Form):
     group = forms.CharField()
     bans = forms.BooleanField()
     syns = forms.ChoiceField(choices=CHOICES)
+
+
+class AddCourse(forms.Form):
+    course_name = forms.CharField()
+    TEACHER_LIST = []
+    for teache in User.objects.filter(is_staff=1):
+        TEACHER_LIST.append((teache.id, teache.username))
+    TEACHER_LIST = tuple(TEACHER_LIST)
+    teach = forms.ChoiceField(widget=forms.Select, choices=TEACHER_LIST)

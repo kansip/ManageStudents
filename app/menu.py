@@ -21,12 +21,12 @@ REGISTER_PAGE_NAME = "register"
 LOGIN_PAGE_NAME = "login"
 USER_PAGE_NAME = "user"
 LOGOUT_PAGE_NAME = "logout"
-
+COURSE_ADD_NAME = "course_add"
 HOME_PAGE_NAME = "index"
 
-USER_LIST_NAME =  "user_list"
-USER_TASK_NAME =  "task_list"
-COURSE_LIST_NAME =  "task_list"
+USER_LIST_NAME = "user_list"
+USER_TASK_NAME = "task_list"
+COURSE_LIST_NAME = "course_list"
 login_menu_item = MenuItem(LOGIN_PAGE_NAME, "Вход", "/login")
 register_menu_item = MenuItem(REGISTER_PAGE_NAME, "Регистрация", "/register")
 
@@ -37,6 +37,8 @@ home_menu_item = MenuItem(HOME_PAGE_NAME, "Главная", "/")
 user_list_item = MenuItem(USER_LIST_NAME, "Список пользователей", "/user/list")
 user_task_item = MenuItem(USER_TASK_NAME, "Список всех задач", "/task/list")
 course_list_item = MenuItem(COURSE_LIST_NAME, "Мои курсы", "/course/list")
+course_add_item = MenuItem(COURSE_ADD_NAME, "Создание курса", "/course/add")
+
 
 def get_context_menu(request, current_name):
     return {"left": get_context_left_menu(request, current_name),
@@ -49,10 +51,6 @@ def get_context_left_menu(request, current_name):
     if request.user.is_authenticated:
         menu.append(course_list_item)
         pass
-        #print("menu")
-        #menu.append(votes_menu_item)
-        #menu.append(user_votes_menu_item)
-        #menu.append(votes_editor_menu_item)
     else:
         menu.append(login_menu_item)
         menu.append(register_menu_item)
@@ -60,6 +58,7 @@ def get_context_left_menu(request, current_name):
     if request.user.is_staff:  # teacher
         menu.append(user_list_item)
         menu.append(user_task_item)
+        menu.append(course_add_item)
     for item in menu:
         if item.name == current_name:
             item.is_active = True

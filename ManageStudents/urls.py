@@ -34,15 +34,16 @@ urlpatterns = [
 
     # task
     path('task/list', views.task_list_view),
-        path('task/<int:task_id>', views.task_view),
+    path('task/<int:task_id>', views.task_view),
     # course
     path('course/list', views.course_list_view),
     path('course/<int:course_id>', views.course_view),
     path('course/<int:course_id>/<int:lesson_id>', views.lesson_view),
-    path('course/<int:course_id>/<int:lesson_id>/<int:block_id>', views.lesson_block_view)
+    path('course/<int:course_id>/<int:lesson_id>/<int:block_id>', views.lesson_block_view),
+    path('course/add', views.add_course)
 
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL,
                           document_root=settings.MEDIA_ROOT)
-    urlpatterns += staticfiles_urlpatterns()
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -4,6 +4,7 @@
 {% endblock %}
 {% block extended_content %}
 {% autoescape off %}
+{% load filters %}
 <div class="container" style="padding-top:20px;">
     <div class="row">
         <div class="col-3">
@@ -15,7 +16,7 @@
                 <div class="row">
                     <div class="col-10" style="font-size:18px;">{{task.name}}</div>
                     <div class="col-1"></div>
-                    <div class="col">{{task.cost}}</div>
+                    <div class="col">{% if task.correct_answer. == user_id%}{{task.cost}}{% else %}-{% endif %}/{{task.cost}}</div>
                 </div>
                 <hr>
                 <div style="padding-bottom:15px;">{{task.desc}}</div>
@@ -29,37 +30,7 @@
                     </div>
                 </form>
                 <div>
-                    <table class="table table-sm table-inverse">
-                      <thead>
-                        <tr>
-                          <th>#</th>
-                          <th>Время</th>
-                          <th>Ваш ответ</th>
-                          <th>Балл</th>
-                        </tr>
-                      </thead>
-                         <tbody>
-                    {% for ans in task.answers.all %}
-                        {% if ans.user_id == user_id %}
-                        {% if ans.score > 0%}
-                        <tr style="color:green">
-                          <th scope="row">{{  forloop.counter }}</th>
-                          <td>{{ ans.time |date:"m/d/Y H:m:s" }}</td>
-                          <td>{{ ans.answer }}</td>
-                          <td>{{ ans.score }}</td>
-                        </tr>
-                        {% else %}
-                        <tr>
-                          <th scope="row">{{  forloop.counter }}</th>
-                          <td>{{ ans.time |date:"m/d/Y H:m:s" }}</td>
-                          <td>{{ ans.answer }}</td>
-                          <td>{{ ans.score }}</td>
-                        </tr>
-                        {% endif %}
-                        {% endif %}
-                    {% endfor%}
-                         </tbody>
-                    </table>
+                    {% include 'scoreboard_task.html'%}
                 </div>
                 {% elif task.format_flag == 1 %}
                 <form method="POST">
@@ -70,6 +41,7 @@
                         <button type="submit" class="btn btn-dark">Отправить</button>
                     </div>
                 </form>
+                    {% include 'scoreboard_task.html'%}
                 {% endif %}
             </div>
             <br>

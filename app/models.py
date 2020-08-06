@@ -19,6 +19,9 @@ class TaskAnswers(models.Model):
     revizion = models.BooleanField(default=0)
 
 
+
+
+
 class Task(models.Model):
     name = models.CharField(max_length=120)
     desc = models.TextField()
@@ -30,6 +33,8 @@ class Task(models.Model):
     accuracy = models.BooleanField(default=1)
     revizion_format_flag = models.BooleanField(default=0)
     answers = models.ManyToManyField(TaskAnswers)
+    correct_answer = models.ManyToManyField(User)
+
 
 
 class TaskTrueAnswers(models.Model):

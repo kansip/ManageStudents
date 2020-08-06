@@ -3,9 +3,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User, Group
 from django.shortcuts import render, redirect
 from django.contrib.admin.views.decorators import user_passes_test
-from app.forms import LoginForm, RegisterForm, ChangeProfile, TaskStringForm
-from app.menu import get_context_menu, REGISTER_PAGE_NAME, LOGIN_PAGE_NAME, HOME_PAGE_NAME, USER_PAGE_NAME, \
-    USER_LIST_NAME, USER_TASK_NAME, COURSE_LIST_NAME
+from app.forms import *
+from app.menu import *
 from app.models import *
 from django.utils import timezone
 from app.checkers import *
@@ -232,6 +231,7 @@ def lesson_view(request, course_id, lesson_id):
     return render(request, 'course/lesson/lesson.html', context)
 
 
+@login_required
 def lesson_block_view(request, course_id, lesson_id, block_id):
     context = {'menu': get_context_menu(request, REGISTER_PAGE_NAME)}  # REGISTER_PAGE_NAME - заглушка
     user_id = request.user.id
@@ -245,7 +245,7 @@ def lesson_block_view(request, course_id, lesson_id, block_id):
             answer = form.cleaned_data['data']
             allocation(task_id, user_id, answer)
         lesson = course.lessons.get(id=lesson_id)
-        path = '/course/' + str(course_id) + '/' + str(lesson_id) + '/' + str(lesson.blocks.all()[0].id)
+        path = '/course/' + str(course_id) + '/' + str(lesson_id) + '/' + str(block_id)
         return redirect(path)
     for i in stud_list:
         if i.course_id.id == course_id:
@@ -260,8 +260,26 @@ def lesson_block_view(request, course_id, lesson_id, block_id):
     return render(request, 'course/lesson/lesson_block.html', context)
 
 
+@user_passes_test(lambda u: u.is_superuser)
 def task_view(request, task_id):
     context = {'menu': get_context_menu(request, REGISTER_PAGE_NAME)}  # REGISTER_PAGE_NAME - заглушка
     task = Task.objects.get(pk=task_id)
     context['task'] = task
     return render(request, 'tasks/task.html', context)
+
+
+@user_passes_test(lambda u: u.is_staff)
+def add_course(request):
+    context = {'menu': get_context_menu(request, COURSE_ADD_NAME)}
+    context['teachers'] = User.objects.filter(is_staff=1)
+    context['user_id'] = request.user.id
+    if request.method == 'POST':
+        form = AddCourse(request.POST)
+        course_name = request.POST['course_name']
+        teacher = request.POST['teach']  # одинаковые названия
+        course = Course.objects.create(name=course_name, teacher=User.objects.get(username=teacher))
+        course.save()
+        stud_group = StudentGroup.objects.create(course=course)
+        stud_group.add(user_id=User.objects.get(username=teacher))
+
+    return render(request, 'admin/add_course.html', context)
