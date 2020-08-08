@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Настройки профиля
+{% endblock %}
+{% load filters %}
+{% block extended_content %}
+    <div id="container" class="container mt-5 mb-5">
+        <div class="card">
+            <div class="card-header" style="background-color: rgba(0, 0, 0, 0);">
+                <div class="row align-items-center" style="justify-content: center;">
+                    <div class="col-auto">
+                        <figure class="figure text-center">
+
+                            <figcaption style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                <h1 style="margin-top: 10px; margin-bottom: 0; white-space: nowrap; font-size: 2rem; font-weight: 400;">
+                                    <span>{{ user.username }}</span></h1>
+
+                                <h2 style="margin:2px; font-size: .85714286em;"><span>Пользователь</span><br></h2>
+                                <h2 style="margin:2px; font-size: .85714286em;"><span>{{ syn }}</span><br></h2>
+
+                            </figcaption>
+                        </figure>
+                    </div>
+                </div>
+            </div>
+            <form method="POST" class="mt-4">
+                {% csrf_token %}
+        <div class="card-body">
+                <h5 class="card-title">Основная информация</h5>
+
+                <table class="table" style="margin-left: 0.25rem">
+                    <tbody>
+                    <tr>
+                        <td>Имя</td>
+                        <td class="aligned"> <input name="first_name" type="text" class="form-control" value="{{user.first_name}}"></td>
+                    </tr>
+                     <tr>
+                        <td >Фамилия</td>
+                        <td class="aligned"> <input name="last_name" type="text" class="form-control" value="{{user.last_name}}"></td>
+                    </tr>
+                    <tr>
+                        <td>Логин</td>
+                        <td class="aligned"> <input name="username" type="text" class="form-control" value="{{user.username}}"></td>
+                    </tr>
+                    <tr>
+                        <td>Новый пароль</td>
+                        <td class="aligned"> <input name="password" type="text" class="form-control" value="" placeholder="Новый пароль"></td>
+                    </tr>
+                    <tr>
+                        <td>Повторение нового пароля</td>
+                        <td class="aligned"> <input name="repit_password" type="text" class="form-control" value="" placeholder="Повторение нового пароля"></td>
+                    </tr>
+                    <tr>
+                        <td >Уровень доступа</td>
+                        <td class="aligned">  {{f.syns}}
+                        </td>
+                    </tr>
+                     <tr>
+                        <td >Заблокировать</td>
+                        <td class="aligned">  <input name="bans" type="checkbox"  value="bans" > Забанен<Br></td>
+                    </tr>
+                    <tr>
+                        <td>Группа</td>
+                        <td class="aligned"> <input name="group" type="text" class="form-control" value="{%if user.profile.group %}{{user.profile.group}}{%else%}Не закреплен{%endif%}"></td>
+                    </tr>
+
+                    </tbody>
+                </table>
+            <div class="text-center mt-4">
+                                <button type="submit" class="btn btn-primary">Сохранить</button>
+                            </div>
+            </div>
+        </div>
+
+
+            </form>
+        </div>
+    </div>
+{%endblock%}

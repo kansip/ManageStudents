@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}
+    Список задач
+{% endblock %}
+{% block extended_content %}
+<br>
+<table class="table container table-hover" >
+    <thead>
+    <tr>
+        <th scope="col">#</th>
+        <th scope="col">Логин</th>
+        <th score="col">Категория</th>
+
+    </tr>
+    </thead>
+    <tbody>
+    {% for task in tasks %}
+    <tr>
+        <th scope="row"><a href="/task/{{task.id}}" style="color:black">{{task.id}}</a></th>
+        <td ><a href="/task/{{task.id}}" style="color:black">{{task.name}}</a></td>
+        <td >{{task.category}}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

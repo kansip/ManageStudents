@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block title %}
+Task
+{% endblock %}
+{% block extended_content %}
+<div id="container" class="container mt-5 mb-5">
+    <div class="card">
+        <div class="card-header" style="background-color: rgba(0, 0, 0, 0);">
+            <div class="row align-items-center" style="justify-content: center;">
+                <div class="col-auto">
+                    <figure class="figure text-center">
+
+                        <figcaption style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            <h1 style="margin-top: 10px; margin-bottom: 0; white-space: nowrap; font-size: 2.1rem; font-weight: 400;">
+                                <span>{{ task.name }}</span><br></h1><span style="font-size:18px; color:black;">{{ task.cost }}</span>
+                            <hr>
+
+
+                        </figcaption>
+                    </figure>
+
+                </div>
+            </div>
+            <div class="card-body" style="font-size:18px; ">
+                {{task.desc}}<br><br>{%if responce == 2%}<div style="color:green;font-size:23px;">Все верно</div>{% elif responce == 1%}<div style="color:red;font-size:23px;"> Не верно  </div>{%else%} <div style="color:black;font-size:23px;">Не решено</div>{% endif %}
+                {% if task.char_format_flag %}
+                 <form method="POST" class="mt-4">
+                     {% csrf_token %}
+                <div class="input-group input-group-lg">
+
+                    <input type="text" name="data" class="form-control" aria-label="Sizing example input"
+                           aria-describedby="inputGroup-sizing-lg">
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="submit" id="button-addon2">Отправить</button>
+                    </div>
+                </div>
+                 </form>
+                {%endif%}
+            </div>
+        </div>
+
+
+    </div>
+</div>
+
+{% endblock %}
