@@ -22,7 +22,9 @@
 9) Обновляем все файлы проекта до состояния файлов архива(CTRL+C,CTRL+V)
 10) Создаем миграцию БД `python manage.py makemigrations`
 11) Применяем микграцию `python manage.py migrate`
-12) В CMD(venv) поднимаем сервер командой  `python manage.py runserver` теперь сайт висит на `localhost` c адресом `http://127.0.0.1:8000`
+12) Настраиваем выдачу static файлов `python manage.py collectstatic`
+13) В CMD(venv) поднимаем сервер командой  `python manage.py runserver` теперь сайт висит на `localhost` c адресом
+`http://127.0.0.1:8000`
 
 
 
