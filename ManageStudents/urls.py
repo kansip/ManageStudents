@@ -40,7 +40,21 @@ urlpatterns = [
     path('course/<int:course_id>', views.course_view),
     path('course/<int:course_id>/<int:lesson_id>', views.lesson_view),
     path('course/<int:course_id>/<int:lesson_id>/<int:block_id>', views.lesson_block_view),
-    path('course/add', views.add_course)
+    path('course/add', views.add_course),
+    path('course/<int:course_id>/settings', views.course_settings_view),
+    path('course/<int:course_id>/dashboard', views.course_dashboard_view),
+    path('course/<int:course_id>/maintenance', views.course_maintenance_view),
+    path('course/<int:course_id>/maintenance/lesson_add', views.course_lesson_add_view),
+    path('course/<int:course_id>/settings/users', views.course_settings_users_view),
+    path('course/<int:course_id>/settings/user/<int:user_id>/delete', views.user_delete_course_view),
+    path('course/<int:course_id>/maintenance/lessons/<int:lesson_id>/delete', views.lesson_delete_course_view),
+    path('course/<int:course_id>/settings/methodical_plan', views.course_settings_methodical_plan),
+    path('course/<int:course_id>/settings/methodical_plan/<int:global_instuction>/delete',
+         views.course_global_instuction_del),
+    path('course/<int:course_id>/main_info', views.course_main_info_settings),
+    # teaching
+    path('teaching/', views.teaching),
+    path('admin/course_list', views.course_list_admin)
 
 ]
 if settings.DEBUG:

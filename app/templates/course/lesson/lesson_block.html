@@ -35,7 +35,7 @@
                 {% elif task.format_flag == 1 %}
                 <form method="POST">
                     {% csrf_token %}
-                    <input type="hidden" name="task_id" value="{{task.id}}">
+                    <input type="hidden" name="user_id_delete" value="{{task.id}}">
                     <textarea class="form-control" name="data" rows="3"></textarea>
                     <div class="text-center" style="padding-top:15px; margin-bottom:10px;">
                         <button type="submit" class="btn btn-dark">Отправить</button>

@@ -19,7 +19,10 @@ class TaskAnswers(models.Model):
     revizion = models.BooleanField(default=0)
 
 
-
+class Grades(models.Model):
+    grade = models.IntegerField()
+    user = models.ForeignKey(User, blank=True, on_delete=models.CASCADE)
+    weight = models.IntegerField()
 
 
 class Task(models.Model):
@@ -34,7 +37,6 @@ class Task(models.Model):
     revizion_format_flag = models.BooleanField(default=0)
     answers = models.ManyToManyField(TaskAnswers)
     correct_answer = models.ManyToManyField(User)
-
 
 
 class TaskTrueAnswers(models.Model):
@@ -55,9 +57,20 @@ class TaskGroup(models.Model):
 
 class Lesson(models.Model):
     teacher = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
-    date = models.DateTimeField()
+    date = models.DateTimeField(null=True)
     blocks = models.ManyToManyField(TaskGroup)
     name = models.CharField(max_length=30)
+    open = models.BooleanField(default=False)
+    grades = models.ManyToManyField(Grades)
+
+
+class MiniSubject(models.Model):
+    name = models.CharField(max_length=30)
+
+
+class MethodicalInstructionsGlobal(models.Model):
+    name = models.CharField(max_length=30)
+    mini_subject = models.ManyToManyField(MiniSubject)
 
 
 class Course(models.Model):
@@ -65,16 +78,12 @@ class Course(models.Model):
     teacher = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
     name = models.CharField(max_length=20)
     image = models.ImageField(upload_to='course/', blank=True)
+    description = models.CharField(max_length=100)
+    open = models.BooleanField(default=False)
+    methodical_instructions = models.ManyToManyField(MethodicalInstructionsGlobal)
 
 
 class StudentGroup(models.Model):
     course_id = models.OneToOneField(Course, on_delete=models.CASCADE)
+    name = models.CharField(max_length=10)
     user_id = models.ManyToManyField(User)
-
-
-class Grades(models.Model):
-    grade = models.IntegerField()
-    user = models.ForeignKey(User, blank=True, on_delete=models.CASCADE)
-    teacher = models.ForeignKey(User, null=True, on_delete=models.SET_NULL, related_name='+')
-    blocks = models.ForeignKey(Lesson, on_delete=models.CASCADE)
-    weight = models.IntegerField()

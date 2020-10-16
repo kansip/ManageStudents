@@ -1,0 +1,11 @@
+<a href="/course/{{course.id}}" class="btn btn-light col" style="color:black;margin-bottom:10px;">Назад в курс</a>
+<a href="/course/{{course.id}}/settings" class="list-group-item list-group-item-action">Главная</a>
+<a href="/course/{{course.id}}/settings/users" class="list-group-item list-group-item-action">Список пользователей</a>
+<a href="/course/{{course.id}}/dashboard" class="list-group-item list-group-item-action">Табель успеваимости</a>
+
+{% if syn %}
+    <a href="/course/{{course.id}}/maintenance" class="list-group-item list-group-item-action">Содержание</a>
+    <a href="/course/{{course.id}}/settings/methodical_plan"
+       class="list-group-item list-group-item-action">Коррекция методического плана</a>
+    <a href="/course/{{course.id}}/main_info" class="list-group-item list-group-item-action">Настройки курса</a>
+{% endif %}

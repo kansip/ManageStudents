@@ -34,10 +34,20 @@ class ChangeProfile(forms.Form):
     syns = forms.ChoiceField(choices=CHOICES)
 
 
+class AddUser(forms.Form):
+    user_id = forms.IntegerField()
+
+
+class AddInstruction(forms.Form):
+    topic = forms.CharField()
+    main_instr_id = forms.IntegerField()
+
+
 class AddCourse(forms.Form):
     course_name = forms.CharField()
     TEACHER_LIST = []
     for teache in User.objects.filter(is_staff=1):
         TEACHER_LIST.append((teache.id, teache.username))
     TEACHER_LIST = tuple(TEACHER_LIST)
+    description = forms.CharField()
     teach = forms.ChoiceField(widget=forms.Select, choices=TEACHER_LIST)

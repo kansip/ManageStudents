@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}
+Настройки курса
+{% endblock %}
+{% block extended_content %}
+<div class="container   ">
+    <H3 style="padding-top:10px;padding-bottom:10px;">Настройки</H3>
+    <div class="row">
+        <div class="col-4">
+            {% include 'left_block_settings_course.html' %}
+        </div>
+        <div class="col-8">
+            <div style="border:1px solid black;border-radius:10px;padding:10px;">
+                <h5>{{course.name}}</h5>
+                <div>{{course.description}}</div>
+                <div>Группа - {{group}}</div>
+                <div>Ведущий педагог - {{course.teacher.first_name}} {{course.teacher.last_name}}</div>
+            </div>
+            <h4 style="padding-top:10px;">Методические указания</h4>
+            {% for main_instr in course.methodical_instructions.all %}
+              <ul>{{main_instr.name}}</ul>
+                {% for subjects in main_instr.mini_subject.all %}
+                <li>{{subjects.name}}</li>
+                {% endfor %}
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

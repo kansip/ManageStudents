@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block title %}
+Настройки курса
+{% endblock %}
+{% block extended_content %}
+<div class="container   ">
+    <H3 style="padding-top:10px;padding-bottom:10px;">Настройки</H3>
+    <div class="row">
+        <div class="col-4">
+            {% include 'left_block_settings_course.html' %}
+        </div>
+        <div class="col-8">
+            <h4>Список слушателей</h4>
+            {% if syn %}
+             <form method="POST">
+                 {% csrf_token %}
+                <div class="input-group mb-3">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text" id="basic-addon1">ID</span>
+                  </div>
+                  <input type="text" name="user_id" class="form-control" >
+                  <div class="input-group-append" id="button-addon4">
+                    <button class="btn btn-outline-secondary" type="submit">Button</button>
+                  </div>
+                </div>
+             </form>
+            <div style="color:red;">{{message}}</div>
+            {% endif %}
+            <ul style="padding:10px;" class="list-group">
+
+            {%for user in users%}
+                    <div class="row">
+                    <a href="/user/{{user.id}}" style="color:black;"
+                   class="list-group-item list-group-item-action col-10">{{forloop.counter}}.  {{user.first_name}}
+                        {{user.last_name}}</a>
+                    {% if syn %}
+                        <a href="/course/{{course.id}}/settings/user/{{user.id}}/delete" class="btn col-2"
+                           style="float:right;border:1px solid red;padding-top:10px;color:black">Исключить
+                        </a>
+                    {% endif %}
+                    </div>
+            {%endfor%}
+            </ul>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}
+Настройки курса
+{% endblock %}
+{% block extended_content %}
+<div class="container   ">
+    <H3 style="padding-top:10px;padding-bottom:10px;">Настройки</H3>
+    <div class="row">
+        <div class="col-4">
+            {% include 'left_block_settings_course.html' %}
+        </div>
+        <div class="col-8">
+           <table class="table table-bordered">
+               <h1 style="color:red;">В РАЗРАБОТКЕ</h1>
+  <thead>
+    <tr>
+      <th scope="col">ФИ</th>
+      <th scope="col">09.01</th>
+      <th scope="col">09.01</th>
+      <th scope="col">09.01</th>
+      <th scope="col">09.01</th>
+<th scope="col">09.01</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">1</th>
+      <td>5</td>
+      <td>4</td>
+      <td>4</td>
+      <td></td>
+      <td></td>
+    </tr>
+  </tbody>
+</table>
+        </div>
+    </div>
+</div>
+{% endblock %}

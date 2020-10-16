@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}
+Настройки курса
+{% endblock %}
+{% block extended_content %}
+<div class="container   ">
+    <H3 style="padding-top:10px;padding-bottom:10px;">Настройки</H3>
+    <div class="row">
+        <div class="col-4">
+            {% include 'left_block_settings_course.html' %}
+        </div>
+        <div class="col-8">
+            <h4>Содеражние курса</h4>
+            {% for lesson in lessons %}
+             <div class="row">
+                <a href="/course/{{course.id}}/{{   lesson.id}}" style="color:black;"
+                   class="list-group-item list-group-item-action col-8">{{forloop.counter}}. {{lesson.name}}</a>
+                    {% if syn %}
+                        <a href="/course/{{course.id}}/maintenance/lessons/{{lesson.id}}/delete" class="btn col-2"
+                           style="float:right;border:1px solid red;padding-top:10px;color:black">Исключить
+                        </a>
+                    {% endif %}
+             </div>
+            {% endfor %}
+            <a href="/course/{{course.id}}/maintenance/lesson_add" class="btn btn-info col-10"
+               style="margin-top:15px;">Добавить урок</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

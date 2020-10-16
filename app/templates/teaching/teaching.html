@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}
+Преподавание
+{% endblock %}
+{% block extended_content %}
+<div class="container">
+    <H3 style="padding-top:10px;padding-bottom:10px;">Преподавание</H3>
+    <div class="row">
+            <div class="list-group col-3">
+              <a href="/user/list" class="list-group-item list-group-item-action">Список пользователей</a>
+              <a href="/task/list" class="list-group-item list-group-item-action">Список всех задач</a>
+              {% if syn %}
+              <a href="/admin/course_list" class="list-group-item list-group-item-action">Список всех курсов</a>
+              <a href="/course/add" class="list-group-item list-group-item-action">Создание курса</a>
+              {% endif %}
+            </div>
+        <div class="col-8">
+            <h4>Мои группы</h4>
+            <div class="list-group" style="margin-top:20px;">
+                {% for course in courses %}
+              <a class="list-group-item list-group-item-action" href="/course/{{course.id}}">
+                  <div style="border-radius:100%;width:100px;height:100px;background:grey;"></div>
+                  <div style="margin-left:110px; margin-top:-60px;margin-bottom:50px;font-size:20px;color:black;">
+                      {{    course.name }}</div>
+              </a>
+                 {% endfor %}
+            </div>
+
+
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -177,6 +177,7 @@ def user_list_page(request):
     return render(request, 'admin/user_list.html', context)
 
 
+@user_passes_test(lambda u: u.is_staff)
 def task_list_view(request):
     context = {'menu': get_context_menu(request, USER_TASK_NAME)}  # REGISTER_PAGE_NAME - заглушка
     context['tasks'] = Task.objects.all()
@@ -190,7 +191,7 @@ def course_list_view(request):
     courses_id = StudentGroup.objects.filter(user_id=user_id)  # refactor
     courses = []
     for i in courses_id:
-        courses.append(Course.objects.get(id=i.id))
+        courses.append(Course.objects.get(id=i.course_id.id))
     context['courses'] = courses
     return render(request, 'course/course_list.html', context)
 
@@ -201,14 +202,15 @@ def course_view(request, course_id):
     user_id = request.user.id
     stud_list = StudentGroup.objects.filter(user_id=user_id)
     course = Course.objects.get(id=course_id)
-    context['course_name'] = "ХЗ"
     for i in stud_list:
-        if i.course_id.id == course_id:
+        if i.course_id.id == course_id and i.course_id.open or request.user == course.teacher or request.user.is_superuser:
             context['lessons'] = course.lessons.all()
             context['date'] = timezone.now()
             context['course'] = course
             break
-
+    context['syn'] = False
+    if request.user.is_staff or request.user.is_superuser:
+        context['syn'] = True
     return render(request, 'course/course.html', context)
 
 
@@ -218,16 +220,21 @@ def lesson_view(request, course_id, lesson_id):
     user_id = request.user.id
     stud_list = StudentGroup.objects.filter(user_id=user_id)
     course = Course.objects.get(id=course_id)
+    context['course'] = course
     for i in stud_list:
         if i.course_id.id == course_id:
             lesson = course.lessons.get(id=lesson_id)
-            context['course'] = course
-            context['lesson'] = lesson
-            context['blocks'] = lesson.blocks.all()
-            if len(lesson.blocks.all()) > 0:
-                path = '/course/' + str(course_id) + '/' + str(lesson_id) + '/' + str(lesson.blocks.all()[0].id)
-                return redirect(path)
-            break
+            if lesson.open:
+                context['course'] = course
+                context['lesson'] = lesson
+                context['blocks'] = lesson.blocks.all()
+                if len(lesson.blocks.all()) > 0:
+                    path = '/course/' + str(course_id) + '/' + str(lesson_id) + '/' + str(lesson.blocks.all()[0].id)
+                    return redirect(path)
+                break
+    context['syn'] = False
+    if request.user.is_staff:
+        context['syn'] = True
     return render(request, 'course/lesson/lesson.html', context)
 
 
@@ -250,13 +257,16 @@ def lesson_block_view(request, course_id, lesson_id, block_id):
     for i in stud_list:
         if i.course_id.id == course_id:
             lesson = course.lessons.get(id=lesson_id)
-            block = lesson.blocks.get(id=block_id)
-
-            context['course'] = course
-            context['lesson'] = lesson
-            context['blocks'] = lesson.blocks.all()
-            context['tasks'] = block.tasks.all()
+            if lesson.open:
+                block = lesson.blocks.get(id=block_id)
+                context['course'] = course
+                context['lesson'] = lesson
+                context['blocks'] = lesson.blocks.all()
+                context['tasks'] = block.tasks.all()
             break
+    context['syn'] = False
+    if request.user.is_staff:
+        context['syn'] = True
     return render(request, 'course/lesson/lesson_block.html', context)
 
 
@@ -268,7 +278,7 @@ def task_view(request, task_id):
     return render(request, 'tasks/task.html', context)
 
 
-@user_passes_test(lambda u: u.is_staff)
+@user_passes_test(lambda u: u.is_superuser)
 def add_course(request):
     context = {'menu': get_context_menu(request, COURSE_ADD_NAME)}
     context['teachers'] = User.objects.filter(is_staff=1)
@@ -276,10 +286,199 @@ def add_course(request):
     if request.method == 'POST':
         form = AddCourse(request.POST)
         course_name = request.POST['course_name']
+        description = request.POST['description']
         teacher = request.POST['teach']  # одинаковые названия
-        course = Course.objects.create(name=course_name, teacher=User.objects.get(username=teacher))
-        course.save()
-        stud_group = StudentGroup.objects.create(course=course)
-        stud_group.add(user_id=User.objects.get(username=teacher))
+        courses = Course.objects.all()
+        flag = True
+        for i in courses:
+            if i.name == course_name:
+                flag = False
+                break
+        if flag:
+            course = Course.objects.create(name=course_name, teacher=User.objects.get(username=teacher),
+                                           description=description)
+            course.save()
+            stud_group = StudentGroup.objects.create(course_id=course)
+            path = '/course/' + str(course.id)
+            return redirect(path)
 
     return render(request, 'admin/add_course.html', context)
+
+
+@user_passes_test(lambda u: u.is_staff)
+def course_settings_view(request, course_id):
+    context = {'menu': get_context_menu(request, COURSE_ADD_NAME)}
+    context['course'] = Course.objects.get(id=course_id)
+    context['group'] = StudentGroup.objects.get(course_id=course_id).name
+    context['syn'] = False
+    if request.user.is_superuser:
+        context['syn'] = True
+    return render(request, 'course/course_settings.html', context)
+
+
+@user_passes_test(lambda u: u.is_staff)
+def course_settings_users_view(request, course_id):
+    context = {'menu': get_context_menu(request, COURSE_ADD_NAME)}
+    course = Course.objects.get(id=course_id)
+    context['course'] = course
+    users = []
+    group = StudentGroup.objects.get(course_id=course_id)
+    for styd in group.user_id.all():
+        users.append(User.objects.get(id=styd.id))
+    context['users'] = users
+    context['syn'] = False
+    if request.user.is_superuser:
+        context['syn'] = True
+    # POST
+    if request.method == 'POST':
+        id_data = request.POST['user_id']
+        if int(User.objects.order_by("-id")[0].id) >= int(id_data):
+            user = User.objects.filter(id=id_data)
+            if len(user) != 0:
+                group.user_id.add(User.objects.get(id=id_data))
+            path = '/course/' + str(course.id) + '/settings/users'
+            return redirect(path)
+        else:
+            context['message'] = "Такого пользователя нет"
+    return render(request, 'course/course_settings_users.html', context)
+
+
+@user_passes_test(lambda u: u.is_superuser)
+def user_delete_course_view(request, course_id, user_id):
+    context = {'menu': get_context_menu(request, COURSE_ADD_NAME)}
+    for i in StudentGroup.objects.get(course_id=course_id).user_id.all():
+        if i == User.objects.get(id=user_id):
+            StudentGroup.objects.get(course_id=course_id).user_id.remove(i)
+    path = '/course/' + str(course_id) + '/settings/users'
+    return redirect(path)
+
+
+@user_passes_test(lambda u: u.is_superuser)
+def lesson_delete_course_view(request, course_id, lesson_id):
+    context = {'menu': get_context_menu(request, COURSE_ADD_NAME)}
+    for i in Course.objects.get(id=course_id).lessons.all():
+        if i == Lesson.objects.get(id=lesson_id):
+            Course.objects.get(id=course_id).lessons.remove(i)
+            Lesson.objects.get(id=lesson_id).delete()
+    path = '/course/' + str(course_id) + '/maintenance'
+    return redirect(path)
+
+
+@user_passes_test(lambda u: u.is_staff)
+def course_dashboard_view(request, course_id):
+    context = {'menu': get_context_menu(request, COURSE_ADD_NAME)}
+    context['course'] = Course.objects.get(id=course_id)
+    context['syn'] = False
+    if request.user.is_superuser:
+        context['syn'] = True
+    return render(request, 'course/course_dashboard.html', context)
+
+
+@user_passes_test(lambda u: u.is_superuser)
+def course_maintenance_view(request, course_id):
+    context = {'menu': get_context_menu(request, COURSE_ADD_NAME)}
+    context['course'] = Course.objects.get(id=course_id)
+    context['lessons'] = Course.objects.get(id=course_id).lessons.all()
+    context['syn'] = False
+    if request.user.is_superuser:
+        context['syn'] = True
+    return render(request, 'course/course_maintenance.html', context)
+
+
+@user_passes_test(lambda u: u.is_superuser)
+def course_settings_methodical_plan(request, course_id):
+    context = {'menu': get_context_menu(request, COURSE_ADD_NAME)}
+    context['course'] = Course.objects.get(id=course_id)
+    if request.method == 'POST':
+        form = AddInstruction(request.POST)
+        if form.is_valid():
+            if form.cleaned_data['main_instr_id'] == -1:
+                global_instruction = MethodicalInstructionsGlobal()
+                global_instruction.name = form.cleaned_data['topic']
+                global_instruction.save()
+                Course.objects.get(id=course_id).methodical_instructions.add(global_instruction)
+            else:
+                instruction = MiniSubject()
+                instruction.name = form.cleaned_data['topic']
+                instruction.save()
+                global_instruction = MethodicalInstructionsGlobal.objects.get(id=form.cleaned_data['main_instr_id'])
+                global_instruction.mini_subject.add(instruction)
+
+    context['syn'] = False
+    if request.user.is_superuser:
+        context['syn'] = True
+    return render(request, 'course/course_methodical_plan.html', context)
+
+
+@user_passes_test(lambda u: u.is_superuser)
+def course_global_instuction_del(request, course_id, global_instuction):
+    context = {'menu': get_context_menu(request, COURSE_ADD_NAME)}
+    instuction = MethodicalInstructionsGlobal.objects.get(id=global_instuction)
+    for i in instuction.mini_subject.all():
+        MiniSubject.objects.get(id=i.id).delete()
+    instuction.delete()
+    path = '/course/' + str(course_id) + '/settings/methodical_plan'
+    return redirect(path)
+
+
+@user_passes_test(lambda u: u.is_superuser)
+def course_lesson_add_view(request, course_id):
+    lesson = Lesson()
+    lesson.teacher = Course.objects.get(id=course_id).teacher
+    lesson.save()
+    Course.objects.get(id=course_id).lessons.add(lesson)
+    path = '/course/' + str(course_id) + '/maintenance'
+    return redirect(path)
+
+
+@user_passes_test(lambda u: u.is_staff)
+def teaching(request):
+    context = {'menu': get_context_menu(request, COURSE_ADD_NAME)}
+    context['courses'] = Course.objects.filter(teacher=request.user.id)
+    context['syn'] = False
+    if request.user.is_superuser:
+        context['syn'] = True
+    return render(request, 'teaching/teaching.html', context)
+
+
+@user_passes_test(lambda u: u.is_superuser)
+def course_list_admin(request):
+    context = {'menu': get_context_menu(request, TEACHING_PAGE_NAME)}
+    context['courses'] = Course.objects.all()
+    return render(request, 'admin/course_list.html', context)
+
+
+@user_passes_test(lambda u: u.is_superuser)
+def course_main_info_settings(request, course_id):
+    context = {'menu': get_context_menu(request, TEACHING_PAGE_NAME)}
+    context['course'] = Course.objects.get(id=course_id)
+    context['teachers'] = User.objects.filter(is_staff=1)
+    if request.method == "POST":
+        form = AddCourse(request.POST)
+        course_name = request.POST['course_name']
+        description = request.POST['description']
+        teacher = request.POST['teach']
+        open = request.POST['open']  # одинаковые названия
+        if open == 'on':
+            open = True
+        else:
+            open = False
+        courses = Course.objects.all()
+        flag = True
+        for i in courses:
+            if i.name == course_name:
+                flag = False
+                break
+        if flag:
+            course = Course.objects.get(id=course_id)
+            course.name = course_name
+            course.teacher = User.objects.get(username=teacher)
+            course.description = description
+            course.open = open
+            course.save()
+            path = '/course/' + str(course.id)
+            return redirect(path)
+    context['syn'] = False
+    if request.user.is_superuser:
+        context['syn'] = True
+    return render(request, 'course/course_main_info.html', context)
